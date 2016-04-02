@@ -33,14 +33,23 @@ keystone.init({
 	'auth': true,
 	'user model': 'User',
 	'cookie secret': 'Secret',
+	'adminui custom styles': 'adminuiCustom/styles.less',
 });
 
 keystone.import('models');
 keystone.set('routes', require('./routes'));
 
 keystone.set('nav', {
-	'access': ['users'],
-	'fields': ['names', 'selects'],
+	'access': [
+		'users',
+	],
+	'fields': [
+		'booleans',
+		'codes',
+		'emails',
+		'names',
+		'selects',
+	],
 });
 
 function dropTestDatabase(done) {

@@ -20,7 +20,7 @@ module.exports = {
 			.pause(browser.globals.defaultPauseTimeout)
 			.end();
 	},
-	'Select field should be visible in initial modal': function (browser) {
+	'Select field should show correctly in the initial modal': function (browser) {
 		browser
 			.click(adminUI.cssSelector.homeView.plusIconLinkForSelectsTabUnderDashboardFieldsSubheading)
 			.waitForElementVisible(adminUI.cssSelector.initialModalView.id)
@@ -30,5 +30,14 @@ module.exports = {
 			.to.be.visible;
 		browser.expect.element(adminUI.cssSelector.initialModalView.fieldType.select.select.name.label)
 			.text.to.equal('Name');
+		browser.expect.element(adminUI.cssSelector.initialModalView.fieldType.select.select.name.value)
+			.to.be.visible;
+
+		browser.expect.element(adminUI.cssSelector.initialModalView.fieldType.select.select.fieldA.label)
+			.to.be.visible;
+		browser.expect.element(adminUI.cssSelector.initialModalView.fieldType.select.select.fieldA.label)
+			.text.to.equal('Field A');
+		browser.expect.element(adminUI.cssSelector.initialModalView.fieldType.select.select.fieldA.inputField)
+			.to.be.visible;
 	},
 };

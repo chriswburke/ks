@@ -21,8 +21,8 @@ var SigninView = React.createClass({
 		};
 	},
 	componentDidMount () {
-		if (this.state.signedOut && window.history.replaceState) {
-			history.replaceState({}, window.location.pathname);
+		if (this.state.signedOut && window.history.replace) {
+			history.replace({}, window.location.pathname);
 		}
 		if (this.refs.email) {
 			ReactDOM.findDOMNode(this.refs.email).select();
@@ -75,7 +75,15 @@ var SigninView = React.createClass({
 				logo = { src: logo[0], width: logo[1], height: logo[2] };
 			}
 		}
-		return false;
+		return (
+			<div className="auth-box__col">
+				<div className="auth-box__brand">
+					<a href="/" className="auth-box__brand__logo">
+						<img src={logo.src} width={logo.width ? logo.width : null} height={logo.height ? logo.height : null} alt={this.props.brand} />
+					</a>
+				</div>
+			</div>
+		);
 	},
 	renderUserInfo () {
 		if (!this.props.user) return null;
@@ -135,6 +143,8 @@ var SigninView = React.createClass({
 					</div>
 				</div>
 				<div className="auth-footer">
+					<span>Powered by </span>
+					<a href="http://keystonejs.com" target="_blank" title="The Node.js CMS and web application platform (new window)">KeystoneJS</a>
 				</div>
 			</div>
 		);
