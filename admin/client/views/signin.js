@@ -137,14 +137,12 @@ var SigninView = React.createClass({
 				<div className={boxClassname}>
 					<h1 className="u-hidden-visually">{this.props.brand ? this.props.brand : 'Keystone'} Sign In </h1>
 					<div className="auth-box__inner">
-						{this.renderBrand()}
 						{this.renderUserInfo()}
 						{this.renderForm()}
 					</div>
 				</div>
 				<div className="auth-footer">
-					<span>Powered by </span>
-					<a href="http://keystonejs.com" target="_blank" title="The Node.js CMS and web application platform (new window)">KeystoneJS</a>
+
 				</div>
 			</div>
 		);
