@@ -1,11 +1,12 @@
-var _ = require('lodash');
-var FieldType = require('../Type');
-var fs = require('fs-extra');
-var grappling = require('grappling-hook');
-var moment = require('moment');
-var path = require('path');
-var util = require('util');
-var utils = require('keystone-utils');
+/**
+Deprecated.
+
+Using this field will now throw an error, and this code will be removed soon.
+
+See https://github.com/keystonejs/keystone/wiki/File-Fields-Upgrade-Guide
+*/
+
+/* eslint-disable */
 
 /**
  * localfile FieldType Constructor
@@ -13,19 +14,16 @@ var utils = require('keystone-utils');
  * @api public
  */
 function localfile (list, path, options) {
-	grappling.mixin(this)
-		.allowHooks('move');
+
+	throw new Error('The LocalFile field type has been removed. Please use File instead.'
+		+ '\n\nSee https://github.com/keystonejs/keystone/wiki/File-Fields-Upgrade-Guide\n');
+
+	/*
+
+	grappling.mixin(this).allowHooks('move');
 	this._underscoreMethods = ['format', 'uploadFile'];
 	this._fixedSize = 'full';
-
-	// TODO: implement filtering, usage disabled for now
-	options.nofilter = true;
-
-	// TODO: implement initial form, usage disabled for now
-	if (options.initial) {
-		throw new Error('Invalid Configuration\n\n'
-			+ 'localfile fields (' + list.key + '.' + path + ') do not currently support being used as initial fields.\n');
-	}
+	this.autoCleanup = options.autoCleanup || false;
 
 	if (options.overwrite !== false) {
 		options.overwrite = true;
@@ -47,7 +45,10 @@ function localfile (list, path, options) {
 		this.post('move', options.post.move);
 	}
 
+	*/
+
 }
+localfile.properName = 'LocalFile';
 util.inherits(localfile, FieldType);
 
 /**
@@ -55,10 +56,9 @@ util.inherits(localfile, FieldType);
  *
  * @api public
  */
-localfile.prototype.addToSchema = function () {
+localfile.prototype.addToSchema = function (schema) {
 
 	var field = this;
-	var schema = this.list.schema;
 
 	var paths = this.paths = {
 		// fields
@@ -196,6 +196,36 @@ localfile.prototype.href = function (item) {
  */
 localfile.prototype.isModified = function (item) {
 	return item.isModified(this.paths.path);
+};
+
+
+function validateInput (value) {
+	// undefined values are always valid
+	if (value === undefined) return true;
+	// TODO: strings may not actually be valid but this will be OK for now
+	// If a string is provided, assume it's a file path and move the file into
+	// place. Come back and check the file actually exists if a string is provided
+	if (typeof value === 'string') return true;
+	// If the value is an object with a path, it is valid
+	if (typeof value === 'object' && value.path) return true;
+	return false;
+}
+
+/**
+ * Validates that a value for this field has been provided in a data object
+ */
+localfile.prototype.validateInput = function (data, callback) {
+	var value = this.getValueFromData(data);
+	utils.defer(callback, validateInput(value));
+};
+
+/**
+ * Validates that input has been provided
+ */
+localfile.prototype.validateRequiredInput = function (item, data, callback) {
+	var value = this.getValueFromData(data);
+	var result = (value || item.get(this.path).path) ? true : false;
+	utils.defer(callback, result);
 };
 
 /**

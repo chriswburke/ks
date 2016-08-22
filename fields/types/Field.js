@@ -1,9 +1,10 @@
 import classnames from 'classnames';
 import evalDependsOn from '../utils/evalDependsOn.js';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Button, FormField, FormInput, FormNote } from 'elemental';
+import { findDOMNode } from 'react-dom';
+import { FormField, FormInput, FormNote } from 'elemental';
 import blacklist from 'blacklist';
+import CollapsedFieldLabel from '../components/CollapsedFieldLabel';
 
 function isObject (arg) {
 	return Object.prototype.toString.call(arg) === '[object Object]';
@@ -33,6 +34,13 @@ var Base = module.exports.Base = {
 			size: 'full',
 		};
 	},
+	getInputName (path) {
+		// This correctly creates the path for field inputs, and supports the
+		// inputNamePrefix prop that is required for nested fields to work
+		return this.props.inputNamePrefix
+			? `${this.props.inputNamePrefix}[${path}]`
+			: path;
+	},
 	valueChanged (event) {
 		this.props.onChange({
 			path: this.props.path,
@@ -49,21 +57,25 @@ var Base = module.exports.Base = {
 	},
 	focus () {
 		if (!this.refs[this.spec.focusTargetRef]) return;
-		ReactDOM.findDOMNode(this.refs[this.spec.focusTargetRef]).focus();
+		findDOMNode(this.refs[this.spec.focusTargetRef]).focus();
 	},
 	renderNote () {
 		if (!this.props.note) return null;
 		return <FormNote note={this.props.note} />;
 	},
 	renderField () {
-		var props = Object.assign(this.props.inputProps, {
-			autoComplete: 'off',
-			name: this.props.path,
-			onChange: this.valueChanged,
-			ref: 'focusTarget',
-			value: this.props.value,
-		});
-		return <FormInput {...props} />;
+		const { autoFocus, value, inputProps } = this.props;
+		return (
+			<FormInput {...{
+				...inputProps,
+				autoFocus,
+				autoComplete: 'off',
+				name: this.getInputName(this.props.path),
+				onChange: this.valueChanged,
+				ref: 'focusTarget',
+				value,
+			}} />
+		);
 	},
 	renderValue () {
 		return <FormInput noedit>{this.props.value}</FormInput>;
@@ -106,7 +118,7 @@ var Mixins = module.exports.Mixins = {
 			if (!this.shouldRenderField()) return null;
 			return (
 				<FormField>
-					<Button type="link" className="collapsed-field-label" onClick={this.uncollapse}>+ Add {this.props.label.toLowerCase()}</Button>
+					<CollapsedFieldLabel onClick={this.uncollapse}>+ Add {this.props.label.toLowerCase()}</CollapsedFieldLabel>
 				</FormField>
 			);
 		},
